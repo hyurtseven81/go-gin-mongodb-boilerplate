@@ -1,8 +1,8 @@
 package test
 
 import (
-	"datapad-data-api/config"
-	"datapad-data-api/db"
+	"data-pad.app/data-api/config"
+	"data-pad.app/data-api/db"
 
 	"github.com/gin-gonic/gin"
 )

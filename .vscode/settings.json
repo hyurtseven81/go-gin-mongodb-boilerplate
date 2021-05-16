@@ -3,7 +3,7 @@
     {
       "previewLimit": 50,
       "driver": "SQLite",
-      "database": "${workspaceFolder:datapad-data-api}/app_data/datapad.db",
+      "database": "${workspaceFolder:data-pad.app/data-api}/app_data/datapad.db",
       "name": "Datapad SQLite"
     }
   ],

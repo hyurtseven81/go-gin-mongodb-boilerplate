@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	"datapad-data-api/test"
+	"data-pad.app/data-api/test"
 )
 
 func TestTasksRouteShouldReturn200(t *testing.T) {

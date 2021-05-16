@@ -2,10 +2,11 @@ package db
 
 import (
 	"context"
-	"datapad-data-api/config"
 	"fmt"
 	"log"
 	"time"
+
+	"data-pad.app/data-api/config"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

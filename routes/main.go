@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"datapad-data-api/health"
-	"datapad-data-api/resources/task"
+	"data-pad.app/data-api/health"
+	"data-pad.app/data-api/resources/task"
 
 	"github.com/gin-gonic/gin"
 )
