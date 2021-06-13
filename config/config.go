@@ -2,7 +2,8 @@
 package config
 
 import (
-	"fmt"
+	"flag"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -18,9 +19,11 @@ var config appConfig
 
 // Init initializes config
 func InitWithEnvFile(envFile string) {
+	flag.Parse()
+
 	err := godotenv.Load(envFile)
 	if err != nil {
-		fmt.Println("Error loading .env file")
+		log.Print("Error loading .env file")
 	}
 
 	config = appConfig{

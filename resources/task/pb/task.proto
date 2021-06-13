@@ -1,0 +1,9 @@
+syntax="proto2";
+package pb;
+option go_package = "./";
+
+message Task {
+      required int64 id = 1;
+      required string title = 2;
+      optional string body = 3;
+}

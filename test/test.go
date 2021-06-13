@@ -7,13 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Init() {
+func Init(env_file string) {
 	gin.SetMode(gin.TestMode)
 
-	config.InitWithEnvFile("../../test.env")
+	if env_file == "" {
+		env_file = "../../test.env"
+	}
+
+	config.InitWithEnvFile(env_file)
 	db.Init()
+}
 
-	defer db.ClearDB()
+func Clear() {
+	db.ClearDB()
 
-	defer db.Disconnect()
+	db.Disconnect()
 }

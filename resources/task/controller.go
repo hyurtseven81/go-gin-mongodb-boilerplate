@@ -4,17 +4,16 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	pb "data-pad.app/data-api/resources/task/pb"
 )
 
 func Get(c *gin.Context) {
-	var tasks []Task
+	_id := int64(1)
+	title := "test"
+	body := "test test test"
 
-	var count int64 = 0
+	task := &pb.Task{Id: &_id, Title: &title, Body: &body}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": gin.H{
-			"items": tasks,
-			"count": count,
-		},
-	})
+	c.ProtoBuf(http.StatusOK, task)
 }

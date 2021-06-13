@@ -1,0 +1,7 @@
+version: "2"
+
+services:
+  api:
+    environment:
+      - SENTRY_DSN=https://455cc9d27aeb4e819c2c0fed552285d4@o484382.ingest.sentry.io/5544561
+      - IMAGE_SERVICE_TOKEN=d4cdbb5af226f213c2740c6b1add9055f0630a04b269bcd8d628b0bb89161c23

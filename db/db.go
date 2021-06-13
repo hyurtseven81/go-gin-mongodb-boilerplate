@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -33,33 +32,34 @@ func Init() {
 
 	parsedConnectionString, err := connstring.ParseAndValidate(connectionString)
 	if err != nil {
-		log.Printf("Failed to parse connection string: %v", err)
+		log.Fatalf("Failed to parse connection string: %v", err)
 	}
 
 	client, err = mongo.NewClient(options.Client().ApplyURI(connectionString))
 	if err != nil {
-		log.Printf("Failed to create client: %v", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
 	ctx, _ := context.WithTimeout(context.Background(), connectTimeout*time.Second)
 
 	err = client.Connect(ctx)
 	if err != nil {
-		log.Printf("Failed to connect to cluster: %v", err)
+		log.Fatalf("Failed to connect to cluster: %v", err)
 	}
 
 	// Force a connection to verify our connection string
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		log.Printf("Failed to ping cluster: %v", err)
+		log.Fatalf("Failed to ping cluster: %v", err)
 	}
 
-	fmt.Println("Connected to MongoDB!")
+	log.Print("Connected to MongoDB!")
 	database = client.Database(parsedConnectionString.Database)
 }
 
 func Disconnect() {
 	client.Disconnect(ctx)
+	log.Print("Disconnected from MongoDB!")
 }
 
 func ClearDB() {
