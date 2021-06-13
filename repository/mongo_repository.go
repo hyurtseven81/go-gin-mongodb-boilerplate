@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"data-pad.app/data-api/db"
@@ -15,19 +14,19 @@ const (
 	timeout = 5
 )
 
-type BaseMongoRepository interface {
+type baseMongoRepository interface {
 	List(query interface{}, projection interface{},
-		skip int64, limit int64, sort interface{}) []interface{}
+		skip int64, limit int64, sort interface{}, results interface{}) error
 }
 
 type MongoRepository struct {
-	BaseMongoRepository
-	collection string
+	baseMongoRepository
+	Collection string
 }
 
 func (x MongoRepository) List(query interface{}, projection interface{},
-	skip int64, limit int64, sort interface{}) []interface{} {
-	c := db.GetDB().Collection(x.collection)
+	skip int64, limit int64, sort interface{}, results interface{}) error {
+	c := db.GetDB().Collection(x.Collection)
 
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 
@@ -60,13 +59,11 @@ func (x MongoRepository) List(query interface{}, projection interface{},
 
 	cursor, err := c.Find(ctx, query, opts)
 	if err != nil {
-		log.Fatalf("Find Error: %s", err)
+		return err
 	}
-	var items []interface{}
-
-	if err = cursor.All(ctx, &items); err != nil {
-		log.Fatal(err)
+	if err = cursor.All(ctx, results); err != nil {
+		return err
 	}
 
-	return items
+	return nil
 }

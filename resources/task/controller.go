@@ -3,17 +3,27 @@ package task
 import (
 	"net/http"
 
+	"data-pad.app/data-api/utils"
 	"github.com/gin-gonic/gin"
-
-	pb "data-pad.app/data-api/resources/task/pb"
 )
 
 func Get(c *gin.Context) {
-	_id := int64(1)
-	title := "test"
-	body := "test test test"
+	var query utils.Query
+	c.BindQuery(&query)
 
-	task := &pb.Task{Id: &_id, Title: &title, Body: &body}
+	projection := query.GetSelect()
+	filter := query.GetFilter()
+	sort := query.GetSort()
 
-	c.ProtoBuf(http.StatusOK, task)
+	var items []Task
+	s := NewTaskService()
+
+	s.List(filter, projection, int64(query.Skip), int64(query.Limit), sort, &items)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"items": items,
+			"count": 0,
+		},
+	})
 }

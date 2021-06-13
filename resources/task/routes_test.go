@@ -3,7 +3,6 @@ package task
 import (
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -15,6 +14,8 @@ import (
 
 func TestTasksRouteShouldReturn200(t *testing.T) {
 	test.Init("")
+
+	defer test.Clear()
 
 	router := gin.Default()
 	v1 := router.Group("/v1")
@@ -33,7 +34,8 @@ func TestTasksRouteShouldReturn200(t *testing.T) {
 }
 
 func TestTasksRouteShouldReturn401WithAuth(t *testing.T) {
-	test.Init()
+	test.Init("")
+	defer test.Clear()
 
 	router := gin.Default()
 	v1 := router.Group("/v1")
@@ -47,22 +49,23 @@ func TestTasksRouteShouldReturn401WithAuth(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
-func TestTasksRouteShouldInsertTask(t *testing.T) {
-	test.Init()
+// func TestTasksRouteShouldInsertTask(t *testing.T) {
+// 	test.Init("")
+// 	defer test.Clear()
 
-	router := gin.Default()
-	v1 := router.Group("/v1")
+// 	router := gin.Default()
+// 	v1 := router.Group("/v1")
 
-	AddTaskRoutes(v1)
+// 	AddTaskRoutes(v1)
 
-	body := `{ 
-		"title": "test title",
-		"body":  "test body" 
-	}`
+// 	body := `{
+// 		"title": "test title",
+// 		"body":  "test body"
+// 	}`
 
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/v1/tasks", strings.NewReader(body))
-	router.ServeHTTP(w, req)
+// 	w := httptest.NewRecorder()
+// 	req, _ := http.NewRequest("POST", "/v1/tasks", strings.NewReader(body))
+// 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusCreated, w.Code)
-}
+// 	assert.Equal(t, http.StatusCreated, w.Code)
+// }
