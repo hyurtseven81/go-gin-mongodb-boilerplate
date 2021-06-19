@@ -15,15 +15,9 @@ func Get(c *gin.Context) {
 	filter := query.GetFilter()
 	sort := query.GetSort()
 
-	var items []Task
 	s := NewTaskService()
 
-	s.List(filter, projection, int64(query.Skip), int64(query.Limit), sort, &items)
+	dataResult := s.List(filter, projection, int64(query.Skip), int64(query.Limit), sort)
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": gin.H{
-			"items": items,
-			"count": 0,
-		},
-	})
+	c.JSON(http.StatusOK, dataResult)
 }

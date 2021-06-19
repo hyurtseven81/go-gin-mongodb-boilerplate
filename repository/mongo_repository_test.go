@@ -236,3 +236,65 @@ func TestFindShouldReturn500ItemsWithLimitOverThan500(t *testing.T) {
 
 	assert.Equal(t, 500, len(items))
 }
+
+func TestCountShouldSucceed(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	var docs bson.A
+
+	for i := 0; i < 500; i++ {
+		doc := bson.D{
+			{Key: "id", Value: int32(i)},
+			{Key: "title", Value: fmt.Sprintf("Test Title %d", i)},
+		}
+		docs = append(docs, doc)
+	}
+
+	db.GetDB().Collection("test").InsertMany(context.Background(), docs)
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+
+	count, err := mongo_repository.Count(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.Equal(t, int64(500), count)
+}
+
+func TestCountShouldSucceedWithQuery(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	var docs bson.A
+
+	for i := 0; i < 500; i++ {
+		doc := bson.D{
+			{Key: "id", Value: int32(i)},
+			{Key: "title", Value: fmt.Sprintf("Test Title %d", i)},
+		}
+		docs = append(docs, doc)
+	}
+
+	db.GetDB().Collection("test").InsertMany(context.Background(), docs)
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+
+	count, err := mongo_repository.Count(bson.D{
+		{Key: "id", Value: bson.D{
+			{Key: "$lt", Value: 100},
+		}},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.Equal(t, int64(100), count)
+}

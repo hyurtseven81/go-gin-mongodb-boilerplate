@@ -67,3 +67,17 @@ func (x MongoRepository) List(query interface{}, projection interface{},
 
 	return nil
 }
+
+func (x MongoRepository) Count(query interface{}) (int64, error) {
+	c := db.GetDB().Collection(x.Collection)
+
+	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+
+	if query == nil {
+		query = bson.M{}
+	}
+
+	result, err := c.CountDocuments(ctx, query)
+
+	return result, err
+}
