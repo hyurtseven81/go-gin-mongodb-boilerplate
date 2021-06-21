@@ -8,4 +8,5 @@ func AddTaskRoutes(rg *gin.RouterGroup) {
 	tasksRoute := rg.Group("/tasks")
 
 	tasksRoute.GET("", Get)
+	tasksRoute.POST("", Insert)
 }

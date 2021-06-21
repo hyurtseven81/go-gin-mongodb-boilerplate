@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"data-pad.app/data-api/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type TaskService struct {
@@ -55,4 +56,16 @@ func (x TaskService) List(filter interface{}, projection interface{},
 	dataResult := utils.NewDataresult(<-items, <-countResult)
 
 	return dataResult
+}
+
+func (x TaskService) Insert(document Task) Task {
+	insertedId, err := taskRepository.Insert(document)
+
+	if err != nil {
+		log.Panicf("Error when inserting the doc: %v", err)
+	}
+
+	document.ID = insertedId.(primitive.ObjectID)
+
+	return document
 }

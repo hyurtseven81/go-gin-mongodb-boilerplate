@@ -21,3 +21,16 @@ func Get(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dataResult)
 }
+
+func Insert(c *gin.Context) {
+	var body Task
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	s := NewTaskService()
+
+	inserted := s.Insert(body)
+
+	c.JSON(http.StatusCreated, inserted)
+}

@@ -1,8 +1,10 @@
 package task
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -49,23 +51,59 @@ func TestTasksRouteShouldReturn401WithAuth(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
 
-// func TestTasksRouteShouldInsertTask(t *testing.T) {
-// 	test.Init("")
-// 	defer test.Clear()
+func TestCreateShouldSucceed(t *testing.T) {
+	test.Init("")
+	defer test.Clear()
 
-// 	router := gin.Default()
-// 	v1 := router.Group("/v1")
+	router := gin.Default()
+	v1 := router.Group("/v1")
+	AddTaskRoutes(v1)
 
-// 	AddTaskRoutes(v1)
+	body := `{
+		"title": "test title",
+		"body":  "test body"
+	}`
 
-// 	body := `{
-// 		"title": "test title",
-// 		"body":  "test body"
-// 	}`
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Set("User", gin.H{
+		"id":       "test",
+		"username": "test",
+	})
+	req, _ := http.NewRequest("POST", "/v1/tasks", strings.NewReader(body))
+	router.ServeHTTP(w, req)
 
-// 	w := httptest.NewRecorder()
-// 	req, _ := http.NewRequest("POST", "/v1/tasks", strings.NewReader(body))
-// 	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusCreated, w.Code)
 
-// 	assert.Equal(t, http.StatusCreated, w.Code)
-// }
+	var got gin.H
+	err := json.Unmarshal(w.Body.Bytes(), &got)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, "test title", got["title"])
+}
+
+func TestCreateShouldRaiseError(t *testing.T) {
+	test.Init("")
+	defer test.Clear()
+
+	router := gin.Default()
+	v1 := router.Group("/v1")
+	AddTaskRoutes(v1)
+
+	body := `{
+		"body":  "test body"
+	}`
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Set("User", gin.H{
+		"id":       "test",
+		"username": "test",
+	})
+	req, _ := http.NewRequest("POST", "/v1/tasks", strings.NewReader(body))
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}

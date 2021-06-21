@@ -10,6 +10,7 @@ import (
 	"data-pad.app/data-api/test"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func initTest() {
@@ -297,4 +298,124 @@ func TestCountShouldSucceedWithQuery(t *testing.T) {
 	}
 
 	assert.Equal(t, int64(100), count)
+}
+
+func TestInsertShouldSucceed(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	doc := bson.D{
+		{Key: "title", Value: "Test Title"},
+	}
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+
+	insertedId, err := mongo_repository.Insert(doc)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.NotEqual(t, nil, insertedId)
+}
+
+func TestUpdateShouldSucceed(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	_id := primitive.NewObjectID()
+
+	doc := bson.D{
+		{Key: "_id", Value: _id},
+		{Key: "title", Value: "Test Title"},
+	}
+	db.GetDB().Collection("test").InsertOne(context.Background(), doc)
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+
+	newDoc := bson.D{
+		{Key: "title", Value: "New Test Title"},
+	}
+
+	assert.NotPanics(
+		t,
+		func() { mongo_repository.Update(_id, newDoc) },
+		"Document not found!",
+	)
+}
+
+func TestUpdateShouldRaiseError(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	_id := primitive.NewObjectID()
+
+	doc := bson.D{
+		{Key: "_id", Value: _id},
+		{Key: "title", Value: "Test Title"},
+	}
+	db.GetDB().Collection("test").InsertOne(context.Background(), doc)
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+
+	newDoc := bson.D{
+		{Key: "title", Value: "New Test Title"},
+	}
+
+	_, err := mongo_repository.Update(primitive.NewObjectID(), newDoc)
+
+	assert.NotEqual(t, nil, err)
+}
+
+func TestDeleteShouldRaiseError(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	_id := primitive.NewObjectID()
+
+	doc := bson.D{
+		{Key: "_id", Value: _id},
+		{Key: "title", Value: "Test Title"},
+	}
+	db.GetDB().Collection("test").InsertOne(context.Background(), doc)
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+	err := mongo_repository.Delete(primitive.NewObjectID())
+
+	assert.NotEqual(t, nil, err)
+}
+
+func TestDeleteShouldSucceed(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	_id := primitive.NewObjectID()
+
+	doc := bson.D{
+		{Key: "_id", Value: _id},
+		{Key: "title", Value: "Test Title"},
+	}
+	db.GetDB().Collection("test").InsertOne(context.Background(), doc)
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+
+	assert.NotPanics(
+		t,
+		func() { mongo_repository.Delete(_id) },
+		"Document not found!",
+	)
 }

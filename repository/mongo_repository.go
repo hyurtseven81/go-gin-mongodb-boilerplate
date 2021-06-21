@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"data-pad.app/data-api/db"
@@ -80,4 +81,42 @@ func (x MongoRepository) Count(query interface{}) (int64, error) {
 	result, err := c.CountDocuments(ctx, query)
 
 	return result, err
+}
+
+func (x MongoRepository) Insert(document interface{}) (interface{}, error) {
+	c := db.GetDB().Collection(x.Collection)
+
+	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+
+	res, err := c.InsertOne(ctx, document)
+
+	return res.InsertedID, err
+}
+
+func (x MongoRepository) Update(id interface{}, document interface{}) (interface{}, error) {
+	c := db.GetDB().Collection(x.Collection)
+
+	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+
+	updateResult, err := c.ReplaceOne(ctx, bson.D{{Key: "_id", Value: id}}, document)
+
+	if updateResult.MatchedCount == 0 {
+		return nil, errors.New("document not found")
+	}
+
+	return document, err
+}
+
+func (x MongoRepository) Delete(id interface{}) error {
+	c := db.GetDB().Collection(x.Collection)
+
+	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+
+	deleteResult, err := c.DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+
+	if deleteResult.DeletedCount == 0 {
+		return errors.New("document not found")
+	}
+
+	return err
 }
