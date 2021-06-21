@@ -41,3 +41,8 @@ To run the tests you need to have a running mongodb database. To do that:
 ```bash
 docker compose up -f docker-compose.mongodb.yaml up -d
 ````
+
+After that you can run 
+```bash
+go test ./...
+```
