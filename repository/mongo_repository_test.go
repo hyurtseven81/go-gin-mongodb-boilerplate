@@ -326,7 +326,7 @@ func TestUpdateShouldSucceed(t *testing.T) {
 
 	defer test.Clear()
 
-	_id := primitive.NewObjectID()
+	_id := primitive.NewObjectID().Hex()
 
 	doc := bson.D{
 		{Key: "_id", Value: _id},
@@ -354,7 +354,7 @@ func TestUpdateShouldRaiseError(t *testing.T) {
 
 	defer test.Clear()
 
-	_id := primitive.NewObjectID()
+	_id := primitive.NewObjectID().Hex()
 
 	doc := bson.D{
 		{Key: "_id", Value: _id},
@@ -370,7 +370,7 @@ func TestUpdateShouldRaiseError(t *testing.T) {
 		{Key: "title", Value: "New Test Title"},
 	}
 
-	_, err := mongo_repository.Update(primitive.NewObjectID(), newDoc)
+	_, err := mongo_repository.Update(primitive.NewObjectID().Hex(), newDoc)
 
 	assert.NotEqual(t, nil, err)
 }
@@ -391,7 +391,7 @@ func TestDeleteShouldRaiseError(t *testing.T) {
 	mongo_repository := MongoRepository{
 		Collection: "test",
 	}
-	err := mongo_repository.Delete(primitive.NewObjectID())
+	err := mongo_repository.Delete(primitive.NewObjectID().Hex())
 
 	assert.NotEqual(t, nil, err)
 }
@@ -401,7 +401,7 @@ func TestDeleteShouldSucceed(t *testing.T) {
 
 	defer test.Clear()
 
-	_id := primitive.NewObjectID()
+	_id := primitive.NewObjectID().Hex()
 
 	doc := bson.D{
 		{Key: "_id", Value: _id},

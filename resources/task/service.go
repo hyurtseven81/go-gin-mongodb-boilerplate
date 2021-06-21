@@ -69,3 +69,23 @@ func (x TaskService) Insert(document Task) Task {
 
 	return document
 }
+
+func (x TaskService) Update(id string, document Task) (Task, *utils.DataPadError) {
+	updatedDocument, err := taskRepository.Update(id, document)
+
+	if err != nil {
+		return document, err
+	}
+
+	return updatedDocument.(Task), nil
+}
+
+func (x TaskService) Delete(id string) *utils.DataPadError {
+	err := taskRepository.Delete(id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

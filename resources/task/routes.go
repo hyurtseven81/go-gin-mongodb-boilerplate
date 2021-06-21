@@ -9,4 +9,6 @@ func AddTaskRoutes(rg *gin.RouterGroup) {
 
 	tasksRoute.GET("", Get)
 	tasksRoute.POST("", Insert)
+	tasksRoute.PUT("/:id", Update)
+	tasksRoute.DELETE("/:id", Delete)
 }

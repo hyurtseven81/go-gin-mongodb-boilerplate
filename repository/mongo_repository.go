@@ -6,7 +6,10 @@ import (
 	"time"
 
 	"data-pad.app/data-api/db"
+	"data-pad.app/data-api/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -26,7 +29,7 @@ type MongoRepository struct {
 }
 
 func (x MongoRepository) List(query interface{}, projection interface{},
-	skip int64, limit int64, sort interface{}, results interface{}) error {
+	skip int64, limit int64, sort interface{}, results interface{}) *utils.DataPadError {
 	c := db.GetDB().Collection(x.Collection)
 
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
@@ -60,16 +63,22 @@ func (x MongoRepository) List(query interface{}, projection interface{},
 
 	cursor, err := c.Find(ctx, query, opts)
 	if err != nil {
-		return err
+		return &utils.DataPadError{
+			StatusCode: 500,
+			Err:        err,
+		}
 	}
 	if err = cursor.All(ctx, results); err != nil {
-		return err
+		return &utils.DataPadError{
+			StatusCode: 500,
+			Err:        err,
+		}
 	}
 
 	return nil
 }
 
-func (x MongoRepository) Count(query interface{}) (int64, error) {
+func (x MongoRepository) Count(query interface{}) (int64, *utils.DataPadError) {
 	c := db.GetDB().Collection(x.Collection)
 
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
@@ -80,43 +89,96 @@ func (x MongoRepository) Count(query interface{}) (int64, error) {
 
 	result, err := c.CountDocuments(ctx, query)
 
-	return result, err
+	if err != nil {
+		return 0, &utils.DataPadError{
+			StatusCode: 500,
+			Err:        err,
+		}
+	}
+
+	return result, nil
 }
 
-func (x MongoRepository) Insert(document interface{}) (interface{}, error) {
+func (x MongoRepository) Insert(document interface{}) (interface{}, *utils.DataPadError) {
 	c := db.GetDB().Collection(x.Collection)
 
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 
 	res, err := c.InsertOne(ctx, document)
 
-	return res.InsertedID, err
+	if err != nil {
+		return nil, &utils.DataPadError{
+			StatusCode: 500,
+			Err:        err,
+		}
+	}
+
+	return res.InsertedID, nil
 }
 
-func (x MongoRepository) Update(id interface{}, document interface{}) (interface{}, error) {
+func (x MongoRepository) Update(id string, document interface{}) (interface{}, *utils.DataPadError) {
 	c := db.GetDB().Collection(x.Collection)
 
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 
-	updateResult, err := c.ReplaceOne(ctx, bson.D{{Key: "_id", Value: id}}, document)
+	objectId, objectIdParseError := primitive.ObjectIDFromHex(id)
+	var (
+		updateResult *mongo.UpdateResult
+		err          error
+	)
+	if objectIdParseError == nil {
+		updateResult, err = c.ReplaceOne(ctx, bson.D{{Key: "_id", Value: objectId}}, document)
+	} else {
+		updateResult, err = c.ReplaceOne(ctx, bson.D{{Key: "_id", Value: id}}, document)
+	}
+
+	if err != nil {
+		return nil, &utils.DataPadError{
+			StatusCode: 500,
+			Err:        err,
+		}
+	}
 
 	if updateResult.MatchedCount == 0 {
-		return nil, errors.New("document not found")
+		return nil, &utils.DataPadError{
+			StatusCode: 404,
+			Err:        errors.New("document not found"),
+		}
 	}
 
-	return document, err
+	return document, nil
 }
 
-func (x MongoRepository) Delete(id interface{}) error {
+func (x MongoRepository) Delete(id string) *utils.DataPadError {
 	c := db.GetDB().Collection(x.Collection)
 
 	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
 
-	deleteResult, err := c.DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+	var (
+		deleteResult *mongo.DeleteResult
+		err          error
+	)
 
-	if deleteResult.DeletedCount == 0 {
-		return errors.New("document not found")
+	objectId, objectIdParseError := primitive.ObjectIDFromHex(id)
+	if objectIdParseError != nil {
+		deleteResult, err = c.DeleteOne(ctx, bson.D{{Key: "_id", Value: objectId}})
+	} else {
+		deleteResult, err = c.DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
 	}
 
-	return err
+	if err != nil {
+		return &utils.DataPadError{
+			StatusCode: 500,
+			Err:        err,
+		}
+	}
+
+	if deleteResult.DeletedCount == 0 {
+		return &utils.DataPadError{
+			StatusCode: 404,
+			Err:        errors.New("document not found"),
+		}
+	}
+
+	return nil
 }

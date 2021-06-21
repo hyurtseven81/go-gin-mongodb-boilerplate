@@ -34,3 +34,37 @@ func Insert(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, inserted)
 }
+
+func Update(c *gin.Context) {
+	var body Task
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id := c.Param("id")
+
+	s := NewTaskService()
+
+	updated, err := s.Update(id, body)
+
+	if err != nil {
+		c.JSON(err.StatusCode, err.Err)
+	}
+
+	c.JSON(http.StatusOK, updated)
+}
+
+func Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	s := NewTaskService()
+
+	err := s.Delete(id)
+
+	if err != nil {
+		c.JSON(err.StatusCode, err.Err)
+	}
+
+	c.String(http.StatusNoContent, "")
+}
