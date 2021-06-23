@@ -18,13 +18,7 @@ const (
 	timeout = 5
 )
 
-type baseMongoRepository interface {
-	List(query interface{}, projection interface{},
-		skip int64, limit int64, sort interface{}, results interface{}) error
-}
-
 type MongoRepository struct {
-	baseMongoRepository
 	Collection string
 }
 
