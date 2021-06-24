@@ -26,7 +26,9 @@ func (x MongoRepository) List(query interface{}, projection interface{},
 	skip int64, limit int64, sort interface{}, results interface{}) *utils.DataPadError {
 	c := db.GetDB().Collection(x.Collection)
 
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+
+	defer cancel()
 
 	opts := options.Find()
 	if sort != nil {
@@ -75,7 +77,8 @@ func (x MongoRepository) List(query interface{}, projection interface{},
 func (x MongoRepository) Get(id string, result interface{}) *utils.DataPadError {
 	c := db.GetDB().Collection(x.Collection)
 
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
 
 	objectId, objectIdParseError := primitive.ObjectIDFromHex(id)
 
@@ -101,7 +104,8 @@ func (x MongoRepository) Get(id string, result interface{}) *utils.DataPadError 
 func (x MongoRepository) Count(query interface{}) (int64, *utils.DataPadError) {
 	c := db.GetDB().Collection(x.Collection)
 
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
 
 	if query == nil {
 		query = bson.M{}
@@ -122,7 +126,8 @@ func (x MongoRepository) Count(query interface{}) (int64, *utils.DataPadError) {
 func (x MongoRepository) Insert(document interface{}) (interface{}, *utils.DataPadError) {
 	c := db.GetDB().Collection(x.Collection)
 
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
 
 	res, err := c.InsertOne(ctx, document)
 
@@ -139,7 +144,8 @@ func (x MongoRepository) Insert(document interface{}) (interface{}, *utils.DataP
 func (x MongoRepository) Update(id string, document interface{}) (interface{}, *utils.DataPadError) {
 	c := db.GetDB().Collection(x.Collection)
 
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
 
 	objectId, objectIdParseError := primitive.ObjectIDFromHex(id)
 	var (
@@ -172,7 +178,8 @@ func (x MongoRepository) Update(id string, document interface{}) (interface{}, *
 func (x MongoRepository) Delete(id string) *utils.DataPadError {
 	c := db.GetDB().Collection(x.Collection)
 
-	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Second)
+	defer cancel()
 
 	var (
 		deleteResult *mongo.DeleteResult
