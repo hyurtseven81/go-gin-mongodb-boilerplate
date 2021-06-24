@@ -1,0 +1,882 @@
+basePath: /
+definitions:
+  dashboard.Dashboard:
+    properties:
+      _id:
+        type: string
+      project_id:
+        type: string
+      sys:
+        $ref: '#/definitions/dashboard.Sys'
+      title:
+        type: string
+    required:
+    - project_id
+    - title
+    type: object
+  dashboard.Sys:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  project.Project:
+    properties:
+      _id:
+        type: string
+      name:
+        type: string
+      sys:
+        $ref: '#/definitions/project.Sys'
+    required:
+    - name
+    type: object
+  project.Sys:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  projectmessage.ProjectMessage:
+    properties:
+      _id:
+        type: string
+      from:
+        type: string
+      project_id:
+        type: string
+      sys:
+        $ref: '#/definitions/projectmessage.Sys'
+      text:
+        type: string
+      to:
+        type: string
+    required:
+    - from
+    - project_id
+    - text
+    type: object
+  projectmessage.Sys:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  snippet.Snippet:
+    properties:
+      _id:
+        type: string
+      chart_type:
+        type: string
+      data:
+        items:
+          $ref: '#/definitions/snippet.SnippetItem'
+        type: array
+      project_id:
+        type: string
+      symbol:
+        type: string
+      sys:
+        $ref: '#/definitions/snippet.Sys'
+      time:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      value:
+        type: number
+    required:
+    - data
+    - project_id
+    - title
+    type: object
+  snippet.SnippetItem:
+    properties:
+      name:
+        type: string
+      time:
+        type: string
+      value:
+        type: number
+    required:
+    - name
+    type: object
+  snippet.Sys:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  utils.Data:
+    properties:
+      count:
+        type: integer
+      items:
+        type: object
+    type: object
+  utils.DataResult:
+    properties:
+      data:
+        $ref: '#/definitions/utils.Data'
+    type: object
+info:
+  contact:
+    email: hyurtseven81@gmail.com
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Data Pad Data api specifications
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Data Pad Data Api
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      consumes:
+      - '*/*'
+      description: get the status of server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Show the status of server.
+      tags:
+      - healthcheck
+  /v1/projects:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: string as JSON / used for filtering the results
+        in: query
+        name: filter
+        type: string
+      - description: string as JSON / used for projecting the results
+        in: query
+        name: select
+        type: string
+      - description: string as JSON / used for sorting the results
+        in: query
+        name: sort
+        type: string
+      - description: used for skipping the results
+        in: query
+        name: skip
+        type: integer
+      - description: used for limitting the results
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project result
+          schema:
+            $ref: '#/definitions/utils.DataResult'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: error details
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: get all projects
+      tags:
+      - project
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/project.Project'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            type: integer
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: insert new project
+      tags:
+      - project
+  /v1/projects/{project_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Empty response
+          schema:
+            type: int
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: delete a project
+      tags:
+      - project
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project result
+          schema:
+            $ref: '#/definitions/project.Project'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Document not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: get a project
+      tags:
+      - project
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Project Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/project.Project'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project result
+          schema:
+            $ref: '#/definitions/utils.DataResult'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: update a project
+      tags:
+      - project
+  /v1/projects/{project_id}/dashboards:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: string as JSON / used for filtering the results
+        in: query
+        name: filter
+        type: string
+      - description: string as JSON / used for projecting the results
+        in: query
+        name: select
+        type: string
+      - description: string as JSON / used for sorting the results
+        in: query
+        name: sort
+        type: string
+      - description: used for skipping the results
+        in: query
+        name: skip
+        type: integer
+      - description: used for limitting the results
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dashboard result
+          schema:
+            $ref: '#/definitions/utils.DataResult'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: error details
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: get all dashboards under a project
+      tags:
+      - dashboard
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Dashboard Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/dashboard.Dashboard'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            type: integer
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: insert new dashboard
+      tags:
+      - dashboard
+  /v1/projects/{project_id}/dashboards/{dashboard_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Dashboard Id
+        in: path
+        name: dashboard_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Empty response
+          schema:
+            type: int
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: delete a dashboard
+      tags:
+      - dashboard
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Dashboard Id
+        in: path
+        name: dashboard_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dashboard result
+          schema:
+            $ref: '#/definitions/dashboard.Dashboard'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Document not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: get a dashboard under a project
+      tags:
+      - dashboard
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Dashboard Id
+        in: path
+        name: dashboard_id
+        required: true
+        type: string
+      - description: Dashboard Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/dashboard.Dashboard'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Dashboard result
+          schema:
+            $ref: '#/definitions/utils.DataResult'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: update a dashboard
+      tags:
+      - dashboard
+  /v1/projects/{project_id}/projectmessages:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: string as JSON / used for filtering the results
+        in: query
+        name: filter
+        type: string
+      - description: string as JSON / used for projecting the results
+        in: query
+        name: select
+        type: string
+      - description: string as JSON / used for sorting the results
+        in: query
+        name: sort
+        type: string
+      - description: used for skipping the results
+        in: query
+        name: skip
+        type: integer
+      - description: used for limitting the results
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ProjectMessage result
+          schema:
+            $ref: '#/definitions/utils.DataResult'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: error details
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: get all projectmessages under a project
+      tags:
+      - projectmessage
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: ProjectMessage Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/projectmessage.ProjectMessage'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            type: integer
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: insert new projectmessage
+      tags:
+      - projectmessage
+  /v1/projects/{project_id}/projectmessages/{project_message_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: ProjectMessage Id
+        in: path
+        name: project_message_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Empty response
+          schema:
+            type: int
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: delete a projectmessage
+      tags:
+      - projectmessage
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: ProjectMessage Id
+        in: path
+        name: project_message_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ProjectMessage result
+          schema:
+            $ref: '#/definitions/projectmessage.ProjectMessage'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Document not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: get a projectmessage under a project
+      tags:
+      - projectmessage
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: ProjectMessage Id
+        in: path
+        name: project_message_id
+        required: true
+        type: string
+      - description: ProjectMessage Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/projectmessage.ProjectMessage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ProjectMessage result
+          schema:
+            $ref: '#/definitions/utils.DataResult'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: update a projectmessage
+      tags:
+      - projectmessage
+  /v1/projects/{project_id}/snippets:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: string as JSON / used for filtering the results
+        in: query
+        name: filter
+        type: string
+      - description: string as JSON / used for projecting the results
+        in: query
+        name: select
+        type: string
+      - description: string as JSON / used for sorting the results
+        in: query
+        name: sort
+        type: string
+      - description: used for skipping the results
+        in: query
+        name: skip
+        type: integer
+      - description: used for limitting the results
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Snippet result
+          schema:
+            $ref: '#/definitions/utils.DataResult'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: error details
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: get all snippets under a project
+      tags:
+      - snippet
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Snippet Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/snippet.Snippet'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            type: integer
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: insert new snippet
+      tags:
+      - snippet
+  /v1/projects/{project_id}/snippets/{snippet_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Snippet Id
+        in: path
+        name: snippet_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Empty response
+          schema:
+            type: int
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: delete a snippet
+      tags:
+      - snippet
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Snippet Id
+        in: path
+        name: snippet_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Snippet result
+          schema:
+            $ref: '#/definitions/snippet.Snippet'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Document not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: get a snippet under a project
+      tags:
+      - snippet
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project Id
+        in: path
+        name: project_id
+        required: true
+        type: string
+      - description: Snippet Id
+        in: path
+        name: snippet_id
+        required: true
+        type: string
+      - description: Snippet Info
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/snippet.Snippet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Snippet result
+          schema:
+            $ref: '#/definitions/utils.DataResult'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: update a snippet
+      tags:
+      - snippet
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

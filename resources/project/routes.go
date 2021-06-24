@@ -7,7 +7,8 @@ import (
 func AddProjectRoutes(rg *gin.RouterGroup) {
 	projectsRoute := rg.Group("/projects")
 
-	projectsRoute.GET("", Get)
+	projectsRoute.GET("", List)
+	projectsRoute.GET("/:project_id", Get)
 	projectsRoute.POST("", Insert)
 	projectsRoute.PUT("/:project_id", Update)
 	projectsRoute.DELETE("/:project_id", Delete)

@@ -58,6 +58,16 @@ func (x DashboardService) List(projectId string, filter interface{}, projection 
 	return dataResult
 }
 
+func (x DashboardService) Get(dashboardId string) (Dashboard, *utils.DataPadError) {
+	var result Dashboard
+	err := dashboardRepository.Get(dashboardId, &result)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func (x DashboardService) Insert(document Dashboard) Dashboard {
 	insertedId, err := dashboardRepository.Insert(document)
 

@@ -11,6 +11,7 @@ import (
 
 type appConfig struct {
 	AppName  string
+	Host     string
 	MongoURI string
 }
 
@@ -28,6 +29,7 @@ func InitWithEnvFile(envFile string) {
 
 	config = appConfig{
 		AppName:  os.Getenv("APP_NAME"),
+		Host:     os.Getenv("HOST"),
 		MongoURI: os.Getenv("MONGO_URI"),
 	}
 

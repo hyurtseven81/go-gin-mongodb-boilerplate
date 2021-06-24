@@ -58,6 +58,16 @@ func (x SnippetService) List(projectId string, filter interface{}, projection in
 	return dataResult
 }
 
+func (x SnippetService) Get(snippetId string) (Snippet, *utils.DataPadError) {
+	var result Snippet
+	err := snippetRepository.Get(snippetId, &result)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func (x SnippetService) Insert(document Snippet) Snippet {
 	insertedId, err := snippetRepository.Insert(document)
 

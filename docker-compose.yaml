@@ -45,7 +45,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - MONGO_URI=mongodb://root:password123@mongodb-primary,mongodb-secondary,mongodb-arbiter/dh_pim?authSource=admin
+      - MONGO_URI=
 
 volumes:
   mongodb_master_data:

@@ -58,6 +58,16 @@ func (x ProjectService) List(filter interface{}, projection interface{},
 	return dataResult
 }
 
+func (x ProjectService) Get(projectId string) (Project, *utils.DataPadError) {
+	var result Project
+	err := projectRepository.Get(projectId, &result)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func (x ProjectService) Insert(document Project) Project {
 	insertedId, err := projectRepository.Insert(document)
 

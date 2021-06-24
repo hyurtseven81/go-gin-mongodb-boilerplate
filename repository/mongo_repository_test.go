@@ -238,6 +238,58 @@ func TestFindShouldReturn500ItemsWithLimitOverThan500(t *testing.T) {
 	assert.Equal(t, 500, len(items))
 }
 
+func TestGetShouldSucceed(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	_id := primitive.NewObjectID()
+	doc := bson.D{
+		{Key: "_id", Value: _id},
+		{Key: "title", Value: "Test Title"},
+	}
+
+	db.GetDB().Collection("test").InsertOne(context.Background(), doc)
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+
+	var result bson.D
+	err := mongo_repository.Get(_id.Hex(), &result)
+	if err != nil {
+		log.Fatalf("Error: %+v", err)
+	}
+
+	log.Printf("Result: %+v", result)
+
+	assert.Equal(t, "Test Title", result.Map()["title"])
+}
+
+func TestGetShouldRaiseError(t *testing.T) {
+	initTest()
+
+	defer test.Clear()
+
+	_id := primitive.NewObjectID()
+	doc := bson.D{
+		{Key: "_id", Value: _id},
+		{Key: "title", Value: "Test Title"},
+	}
+
+	db.GetDB().Collection("test").InsertOne(context.Background(), doc)
+
+	mongo_repository := MongoRepository{
+		Collection: "test",
+	}
+
+	_id = primitive.NewObjectID()
+
+	var result bson.D
+	err := mongo_repository.Get(_id.Hex(), &result)
+	assert.NotEqual(t, nil, err)
+}
+
 func TestCountShouldSucceed(t *testing.T) {
 	initTest()
 

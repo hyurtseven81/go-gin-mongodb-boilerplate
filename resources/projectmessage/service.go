@@ -58,6 +58,16 @@ func (x ProjectMessageService) List(projectId string, filter interface{}, projec
 	return dataResult
 }
 
+func (x ProjectMessageService) Get(projectMessageId string) (ProjectMessage, *utils.DataPadError) {
+	var result ProjectMessage
+	err := projectMessageRepository.Get(projectMessageId, &result)
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func (x ProjectMessageService) Insert(document ProjectMessage) ProjectMessage {
 	insertedId, err := projectMessageRepository.Insert(document)
 

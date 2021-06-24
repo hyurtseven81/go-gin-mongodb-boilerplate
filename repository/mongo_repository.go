@@ -72,6 +72,32 @@ func (x MongoRepository) List(query interface{}, projection interface{},
 	return nil
 }
 
+func (x MongoRepository) Get(id string, result interface{}) *utils.DataPadError {
+	c := db.GetDB().Collection(x.Collection)
+
+	ctx, _ := context.WithTimeout(context.Background(), timeout*time.Second)
+
+	objectId, objectIdParseError := primitive.ObjectIDFromHex(id)
+
+	if objectIdParseError == nil {
+		if err := c.FindOne(ctx, bson.D{{Key: "_id", Value: objectId}}).Decode(result); err != nil {
+			return &utils.DataPadError{
+				StatusCode: 404,
+				Err:        errors.New("document not found"),
+			}
+		}
+	} else {
+		if err := c.FindOne(ctx, bson.D{{Key: "_id", Value: id}}).Decode(result); err != nil {
+			return &utils.DataPadError{
+				StatusCode: 404,
+				Err:        errors.New("document not found"),
+			}
+		}
+	}
+
+	return nil
+}
+
 func (x MongoRepository) Count(query interface{}) (int64, *utils.DataPadError) {
 	c := db.GetDB().Collection(x.Collection)
 

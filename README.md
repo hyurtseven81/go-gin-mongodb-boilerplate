@@ -17,6 +17,7 @@ Basically it's built on top of the following ideas:
 - Docker compose support
 - Healthcheck support
 - Follows [12factor.net](https://12factor.net) standards
+- Swagger integration
 
 
 ## Quick setup
@@ -32,6 +33,12 @@ or by building from scratch
 ```bash
 go get
 air
+```
+
+To create/update the swagger documentation
+
+```bash
+swag init
 ```
 
 ### Tests
